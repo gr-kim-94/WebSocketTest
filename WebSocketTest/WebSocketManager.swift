@@ -63,9 +63,6 @@ class WebSocketManager: NSObject, ObservableObject {
     }
     
     private func ping() {
-        guard state == .connected else { return }
-        
-        // task connected 상태인 경우에만 ping...
         task?.sendPing(pongReceiveHandler: { error in
             if let error = error {
                 print("Sending PING failed: \(error)")
@@ -73,8 +70,11 @@ class WebSocketManager: NSObject, ObservableObject {
             
             print("Sending PING...")
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-                self.ping()
+            if self.state == .connected {
+                // task connected 상태인 경우에만 ping...
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                    self.ping()
+                }
             }
         })
     }
